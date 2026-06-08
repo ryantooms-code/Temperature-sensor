@@ -8,7 +8,7 @@ services:
 
     # Forward Flask API port to the host
     ports:
-      - "5000:5000"
+      - "5002:5002"
 
     # Mount the host DB directory so data persists across container restarts
     volumes:
@@ -18,11 +18,11 @@ services:
     # These lines have no effect on non-Pi hosts and can be left in safely.
     devices:
       - /dev/i2c-1:/dev/i2c-1
-    privileged: false
-    group_add:
-      - i2c
+      - /dev/fb0:/dev/fb0
+      - /dev/fb1:/dev/fb1
+    privileged: true
 
-    # Load environment variables from .env (copy .env.example → .env first)
+    # Load environment variables from .env
     env_file:
       - .env
 
@@ -30,3 +30,4 @@ services:
     environment:
       - DB_PATH=/home/toomsey/assignement/sense_data.db
       - POLL_INTERVAL=30
+      - BLYNK_AUTH_TOKEN=pSbVAjTPl9HX_ObS3Pe3WzlsBaN5TK1O

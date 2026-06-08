@@ -1,9 +1,6 @@
 """
 init_db.py - One-shot script to create sense_data.db and its schema.
 Run this once before starting the app, or whenever you need to reset the DB.
-
-Usage:
-    python init_db.py
 """
 
 import os

@@ -31,7 +31,7 @@ COPY blynk_client.py .
 RUN mkdir -p /home/toomsey/assignement
 
 # Expose Flask API port
-EXPOSE 5000
+EXPOSE 5002
 
 # Environment defaults — override at runtime via --env-file or -e flags
 ENV DB_PATH=/home/toomsey/assignement/sense_data.db \

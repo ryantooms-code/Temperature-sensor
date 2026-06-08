@@ -20,4 +20,4 @@ if __name__ == "__main__":
     # Start Flask API
     app = create_app()
     logger.info("Flask API starting on port 5000...")
-    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    app.run(host="0.0.0.0", port=5002, debug=False, use_reloader=False)

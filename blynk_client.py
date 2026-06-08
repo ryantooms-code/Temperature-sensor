@@ -15,7 +15,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 # ── Configuration (set these in your .env or Docker environment) ─────────────
-BLYNK_AUTH_TOKEN = os.environ.get("BLYNK_AUTH_TOKEN", "pSbVAjTPl9HX_ObS3Pe3WzlsBaN5TK1O")
+BLYNK_AUTH_TOKEN = os.environ.get("BLYNK_AUTH_TOKEN", "pSbVAjTPl9HX_ObS3Pe3WzlsBaN5TK1O").strip()
 BLYNK_SERVER     = os.environ.get("BLYNK_SERVER", "https://blynk.cloud")
 
 # Virtual pin assignments
@@ -54,12 +54,9 @@ def _update_pin(pin: str, value) -> bool:
 
 
 def push_to_blynk(temperature: float, humidity: float, pressure: float, status: str):
-
-    if BLYNK_AUTH_TOKEN == "pSbVAjTPl9HX_ObS3Pe3WzlsBaN5TK1O":
-        logger.warning(
-            "BLYNK_AUTH_TOKEN is not set — skipping Blynk update. "
-            "Set it in your .env file or Docker environment."
-        )
+    token = BLYNK_AUTH_TOKEN.strip()
+    if not token or len(token) < 10:
+        logger.warning("BLYNK_AUTH_TOKEN appears missing or too short — skipping.")
         return
 
     results = {

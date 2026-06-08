@@ -29,25 +29,26 @@ BLUE   = (0,   0,   255)
 GREEN  = (0,   200, 0)
 
 
-def _get_sense():
-    """
-    Import and return a SenseHat instance.
-    Wrapped so the rest of the module can be imported on non-Pi hardware
-    (e.g. during unit tests) without crashing.
-    """
-    try:
-        from sense_hat import SenseHat  # type: ignore
-        return SenseHat()
-    except Exception as exc:
-        logger.warning("SenseHat not available: %s — using mock values.", exc)
-        return None
+_sense_instance = None
 
+def _get_sense():
+    global _sense_instance
+    if _sense_instance is not None:
+        return _sense_instance
+    try:
+        from sense_hat import SenseHat
+        _sense_instance = SenseHat()
+        logger.info("SenseHat initialised successfully.")
+        return _sense_instance
+    except Exception as exc:
+        logger.warning("SenseHat not available: %s", exc)
+        return None
 
 def _read_sensors(sense):
     """
     Read temperature, humidity, and pressure.
     SenseHat's CPU can inflate the temperature reading; a small correction
-    factor is applied. Adjust TEMP_CORRECTION in your environment if needed.
+    factor is applied. Adjust TEMP_CORRECTION.
     """
     correction = float(os.environ.get("TEMP_CORRECTION", "-5"))
 
@@ -76,18 +77,20 @@ def _determine_status(temperature: float) -> str:
 
 
 def _set_led(sense, status: str):
-
     if sense is None:
+        logger.warning("SenseHat not available — cannot update LED.")
         return
-
-    colour_map = {
-        "HOT":    RED,
-        "COLD":   BLUE,
-        "NORMAL": GREEN,
-    }
-    colour = colour_map.get(status, GREEN)
-    sense.clear(*colour)
-    logger.debug("LED set to %s for status %s", colour, status)
+    try:
+        colour_map = {
+            "HOT":    (255, 0,   0),
+            "COLD":   (0,   0,   255),
+            "NORMAL": (0,   200, 0),
+        }
+        colour = colour_map.get(status, (0, 200, 0))
+        sense.clear(colour[0], colour[1], colour[2])
+        logger.info("LED updated to %s for status %s", colour, status)
+    except Exception as exc:
+        logger.error("LED update failed: %s", exc, exc_info=True)
 
 
 def start_sensor_loop():
