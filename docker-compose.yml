@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  sensehat-monitor:
+    build: .
+    container_name: sensehat_monitor
+    restart: unless-stopped
+
+    # Forward Flask API port to the host
+    ports:
+      - "5000:5000"
+
+    # Mount the host DB directory so data persists across container restarts
+    volumes:
+      - /home/toomsey/assignement:/home/toomsey/assignement
+
+    # Give the container access to the SenseHat hardware (Raspberry Pi only)
+    # These lines have no effect on non-Pi hosts and can be left in safely.
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+    privileged: false
+    group_add:
+      - i2c
+
+    # Load environment variables from .env (copy .env.example → .env first)
+    env_file:
+      - .env
+
+    # Override or add individual env vars here if needed
+    environment:
+      - DB_PATH=/home/toomsey/assignement/sense_data.db
+      - POLL_INTERVAL=30
